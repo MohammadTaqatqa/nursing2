@@ -62,23 +62,35 @@ body {
   opacity: 1;
 }
 
-/* نص المعلومات في منتصف الشاشة مع ظل أبيض شفاف - نسخة أصغر */
+/* نص المعلومات في منتصف الشاشة مع ظل أبيض شفاف */
 #infoBox {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: rgba(255,255,255,0.85); /* ظل أبيض شفاف */
-  padding: 15px 20px;                /* أقل مساحة داخلية */
+  background: rgba(255,255,255,0.85);
+  padding: 15px 20px;
   border-radius: 12px;
-  max-width: 350px;                  /* أصغر عرض */
-  font-size: 16px;                    /* تصغير حجم الخط */
+  width: 80%;
+  max-width: 400px;
+  max-height: 70%;
+  overflow-y: auto;
+  font-size: 16px;
   line-height: 1.4;
   text-align: right;
-  box-shadow: 0 0 10px rgba(255,255,255,0.7); /* ظل أبيض أخف */
+  box-shadow: 0 0 15px rgba(0,0,0,0.5);
   z-index: 10;
+  word-wrap: break-word;
 }
 
+/* شاشات صغيرة */
+@media (max-width: 480px) {
+  #infoBox {
+    width: 90%;
+    font-size: 14px;
+    padding: 10px 12px;
+  }
+}
 </style>
 </head>
 <body>
