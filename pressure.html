@@ -23,9 +23,23 @@
   <button id="prevBtn" class="btn">السابق</button>
   <button id="nextBtn" class="btn">التالي</button>
 </div>
-<div id="introText">
+<div id="introText" style="
+  position: absolute;          /* فوق الصورة */
+  top: 50%;                    /* يوسّط عموديًا */
+  left: 50%;                   /* يوسّط أفقيًا */
+  transform: translate(-50%, -50%);
+  background: rgba(255,255,255,0.7);  /* ظل أبيض شفاف */
+  padding: 15px;
+  border-radius: 12px;
+  max-width: 90%;              /* لا يتجاوز 90% من الشاشة */
+  font-size: 16px;             /* حجم خط متوسط */
+  line-height: 1.5;
+  text-align: right;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  overflow-wrap: break-word;
+">
   <p>
-    - الضغط الطبيعي للأطفال بعمر 3–6 سنوات:  100 / 65 ملم زئبق<br>
+    - الضغط الطبيعي للأطفال بعمر 3–6 سنوات: 100 / 65 ملم زئبق<br>
     - ما هو ضغط الدم؟<br>
     قوة تدفع الدم داخل الشرايين لتزويد أعضاء الجسم بالتغذية والأكسجين.<br>
     يساعدنا على معرفة ما إذا كان القلب والشرايين يعملان بصورة سليمة.<br><br>
@@ -35,6 +49,17 @@
     وللتأكد من أن الطفل بخير عند المرض أو عند الاشتباه بوجود تغيرات صحية.
   </p>
 </div>
+
+<style>
+/* Media Query لتصغير النص أكثر على الشاشات الصغيرة */
+@media (max-width: 480px) {
+  #introText {
+    font-size: 14px;
+    padding: 10px;
+  }
+}
+</style>
+
 
 
 <button id="startBtn" class="btn">هيا نبدأ</button>
