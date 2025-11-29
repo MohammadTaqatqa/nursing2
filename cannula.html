@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تركيب الكانيولا</title>
+<link rel="stylesheet" href="cannula.css">
+<style>
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+  direction: rtl;
+  text-align: center;
+  background: #63c3ec;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn {
+  display: inline-block;
+  background-color: #2b8de3;
+  color: white;
+  padding: 12px 20px;
+  font-size: 18px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: 0.3s;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  margin: 10px;
+}
+.btn:hover {
+  background-color: #1e6fbf;
+}
+
+.device-container {
+  position: relative;
+  width: 400px;
+  height: 500px;
+  margin-top: 20px;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.image-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transition: opacity 0.8s ease-in-out; 
+}
+
+.image-layer.active {
+  opacity: 1;
+}
+
+/* نص المعلومات في منتصف الشاشة مع ظل أبيض شفاف - نسخة أصغر */
+#infoBox {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255,255,255,0.85); /* ظل أبيض شفاف */
+  padding: 15px 20px;                /* أقل مساحة داخلية */
+  border-radius: 12px;
+  max-width: 350px;                  /* أصغر عرض */
+  font-size: 16px;                    /* تصغير حجم الخط */
+  line-height: 1.4;
+  text-align: right;
+  box-shadow: 0 0 10px rgba(255,255,255,0.7); /* ظل أبيض أخف */
+  z-index: 10;
+}
+
+</style>
+</head>
+<body>
+
+<!-- مربع المعلومات في منتصف الشاشة -->
+<div id="infoBox">
+  <b>- ما هي الكانيولا؟</b><br>
+  • أنبوب صغير يدخل بالوريد لإعطاء السوائل والأدوية.<br><br>
+  <hr>
+  <b>- لماذا نركّب الكانيولا؟</b><br>
+  • لإعطاء العلاج مباشرة للدم.<br>
+  • لمتابعة حالة الطفل عند المرض.<br>
+  • لتسهيل سحب الدم دون وخز متكرر.<br><br>
+  <hr>
+  <b>- متى نحتاجها؟</b><br>
+  • في الجفاف.<br>
+  • عند الحاجة لمضاد وريدي.<br>
+  • في الحالات الطارئة.
+</div>
+
+<!-- الأصوات -->
+<audio id="bgMusic" src="./kids.mp3" style="display:none" loop></audio>
+<audio id="laughSound" src="./kids22.mp3" style="display:none"></audio>
+
+<a href="index.html" class="btn">العودة للصفحة الرئيسية</a>
+
+<div class="device-container">
+  <div class="image-layer"></div>
+  <div class="image-layer"></div>
+</div>
+
+<div class="navigation" id="navButtons">
+  <button id="prevBtn" class="btn">السابق</button>
+  <button id="nextBtn" class="btn">التالي</button>
+</div>
+
+<button id="startBtn" class="btn">هيا نبدأ</button>
+
+<script>
+// المتغيرات الأساسية
+const startBtn = document.getElementById("startBtn");
+const nextBtn = document.getElementById("nextBtn");
+const prevBtn = document.getElementById("prevBtn");
+const nav = document.getElementById("navButtons");
+const layers = document.querySelectorAll(".image-layer");
+
+const bgMusic = document.getElementById("bgMusic");
+bgMusic.volume = 0.1;
+const laughSound = document.getElementById("laughSound");
+laughSound.volume = 0.2;
+
+let index = 0;
+let current = 0;
+let currentAudio = null;
+let queue = [];
+let playingQueue = false;
+
+// الصور
+const images = [
+  'https://www.raed.net/img?id=1456115',
+  'https://www.raed.net/img?id=1456113',
+  'https://www.raed.net/img?id=1456114',
+  'https://www.raed.net/img?id=1456117',
+  'https://www.raed.net/img?id=1456118',
+  'https://www.raed.net/img?id=1456119',
+  'https://www.raed.net/img?id=1456121',
+  'https://www.raed.net/img?id=1456122',
+  'https://www.raed.net/img?id=1456123',
+  'https://www.raed.net/img?id=1456125',
+  'https://www.raed.net/img?id=1456126',
+  'https://www.raed.net/img?id=1456127',
+  'https://www.raed.net/img?id=1456128',
+  'https://www.raed.net/img?id=1456129',
+  'https://www.raed.net/img?id=1456130'
+];
+
+// الأصوات لكل صورة
+const sounds = [
+  ["sounds_C/1.mp3","sounds_C/2.mp3"],
+  ["sounds_C/3.mp3"],
+  [null],
+  [null],
+  ["sounds_C/4.mp3"],
+  [null],
+  ["sounds_C/5.mp3"],
+  ["sounds_C/6.mp3"],
+  [null],
+  ["sounds_C/7.mp3"],
+  ["sounds_C/8.mp3"],
+  [null],
+  ["sounds_C/9.mp3"],
+  ["sounds_C/10.mp3"],
+  ["sounds_C/11.mp3","sounds_C/12.mp3"]
+];
+
+// تشغيل الأصوات المتتالية
+function playQueue(list) {
+  if (!list || list.length === 0) return;
+  queue = [...list];
+  playingQueue = true;
+  function playNext() {
+    if (queue.length === 0) { playingQueue = false; return; }
+    let soundFile = queue.shift();
+    currentAudio = new Audio(soundFile);
+    currentAudio.volume = 1.0;
+    currentAudio.onended = playNext;
+    currentAudio.play().catch(() => {});
+  }
+  playNext();
+}
+
+// عرض الصورة
+function showImage(i) {
+  const next = (current + 1) % 2;
+  layers[next].style.backgroundImage = `url('${images[i]}')`;
+  layers[current].classList.remove("active");
+  layers[next].classList.add("active");
+  current = next;
+
+  nextBtn.style.display = i === images.length - 1 ? "none" : "inline-block";
+  prevBtn.style.display = i === 0 ? "none" : "inline-block";
+
+  if (currentAudio) try { currentAudio.pause(); } catch {}
+  playingQueue = false;
+  queue = [];
+
+  if (i === images.length - 1) {
+    bgMusic.pause();
+    laughSound.play().catch(() => {});
+  }
+
+  bgMusic.play().catch(() => {});
+  if (sounds[i]) playQueue(sounds[i]);
+}
+
+// بداية الصفحة
+window.addEventListener("DOMContentLoaded", () => {
+  layers[0].style.backgroundImage = `url('${images[0]}')`;
+  layers[0].classList.add("active");
+  prevBtn.style.display = "none";
+});
+
+// زر البدء
+startBtn.addEventListener("click", () => {
+  document.getElementById("infoBox").style.display = "none";
+  startBtn.style.display = "none";
+  nav.classList.add("show");
+  bgMusic.currentTime = 0;
+  bgMusic.play().catch(() => {});
+  index = 0;
+  showImage(index);
+});
+
+// أزرار التنقل
+nextBtn.addEventListener("click", () => { index = Math.min(index + 1, images.length - 1); showImage(index); });
+prevBtn.addEventListener("click", () => { index = Math.max(index - 1, 0); showImage(index); });
+</script>
+
+</body>
+</html>

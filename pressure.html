@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>قياس الضغط</title>
+<link rel="stylesheet" href="pressure.css">
+</head>
+<body>
+
+<!-- الأصوات -->
+<audio id="bgMusic" src="./kids.mp3" style="display:none" loop></audio>
+<audio id="laughSound" src="./kids22.mp3" style="display:none"></audio>
+
+<a href="index.html" class="btn">العودة للصفحة الرئيسية</a>
+
+<div class="device-container">
+  <div class="image-layer"></div>
+  <div class="image-layer"></div>
+</div>
+
+<div class="navigation" id="navButtons">
+  <button id="prevBtn" class="btn">السابق</button>
+  <button id="nextBtn" class="btn">التالي</button>
+</div>
+<div id="introText">
+  <p>
+    - الضغط الطبيعي للأطفال بعمر 3–6 سنوات:  100 / 65 ملم زئبق<br>
+    - ما هو ضغط الدم؟<br>
+    قوة تدفع الدم داخل الشرايين لتزويد أعضاء الجسم بالتغذية والأكسجين.<br>
+    يساعدنا على معرفة ما إذا كان القلب والشرايين يعملان بصورة سليمة.<br><br>
+    - لماذا نقيس ضغط الدم؟<br>
+    للكشف المبكر عن أي مشكلة صحية محتملة.<br>
+    لمتابعة صحة القلب والدورة الدموية.<br>
+    وللتأكد من أن الطفل بخير عند المرض أو عند الاشتباه بوجود تغيرات صحية.
+  </p>
+</div>
+
+
+<button id="startBtn" class="btn">هيا نبدأ</button>
+
+<script>
+const startBtn = document.getElementById("startBtn");
+const nextBtn = document.getElementById("nextBtn");
+const prevBtn = document.getElementById("prevBtn");
+const nav = document.getElementById("navButtons");
+const layers = document.querySelectorAll(".image-layer");
+
+const bgMusic = document.getElementById("bgMusic");
+const laughSound = document.getElementById("laughSound");
+// 🔊 تعديل مستوى الصوت
+laughSound.volume = 1.0; // أعلى صوت للضحكة
+bgMusic.volume = 0.4;    // الموسيقى الخلفية شوي أهدى (اختياري)
+
+// --- مصفوفة الصور (ما غيرناها) ---
+const images = [
+  'https://www.raed.net/img?id=1452084',
+  'https://www.raed.net/img?id=1452089',
+  'https://www.raed.net/img?id=1452090',
+  'https://www.raed.net/img?id=1452098',
+  'https://www.raed.net/img?id=1452099',
+  'https://www.raed.net/img?id=1452102',
+  'https://www.raed.net/img?id=1452105',
+  'https://www.raed.net/img?id=1452106',
+  'https://www.raed.net/img?id=1452101',
+  'https://www.raed.net/img?id=1452106'
+
+
+];
+
+// --- مصفوفة الأصوات بالترتيب اللي طلبتيه (11 ثم 3-9) ---
+// تأكدي إن هذه الملفات موجودة داخل: code/sounds_P/11.mp3 ... 9.mp3
+const sounds = [
+
+  "sounds_P/11.mp3",
+  "sounds_P/3.mp3",
+  "sounds_P/4.mp3",
+   null, 
+  null, 
+  "sounds_P/5.mp3", 
+  "sounds_P/6.mp3",
+  "sounds_P/7.mp3",
+  "sounds_P/9.mp3",
+  null
+  
+];
+
+let index = 0;
+let current = 0;
+let currentImageAudio = null; // الصوت الخاص بكل صورة (نوقفه قبل تشغيل صوت جديد)
+
+function showImage(i) {
+  const next = (current + 1) % 2;
+  layers[next].style.backgroundImage = `url('${images[i]}')`;
+  layers[current].classList.remove("active");
+  layers[next].classList.add("active");
+  current = next;
+
+  // إظهار/إخفاء أزرار التنقل
+  nextBtn.style.display = i === images.length - 1 ? "none" : "inline-block";
+  prevBtn.style.display = i === 0 ? "none" : "inline-block";
+
+  // نوقف الصوت الخاص بالصورة السابقة (لو كان شغّال)
+  if (currentImageAudio) {
+    try { currentImageAudio.pause(); } catch(e) {}
+    currentImageAudio = null;
+  }
+
+  // إذا وصولنا للآخر: نوقف الموسيقى الخلفية ونشغّل الصوت النهائي (laughSound)
+  if (i === images.length - 1) {
+    try { bgMusic.pause(); } catch(e) {}
+    // نوقف أي صوت صورة مؤقت (عملناه فوق)
+    laughSound.currentTime = 0;
+    laughSound.play().catch(err => console.log("Error playing laughSound:", err));
+  } else {
+    // لأي صورة غير الأخيرة: نضمن أن bgMusic شغّال ثم نشغّل صوت هذه الصورة
+    bgMusic.play().catch(err => console.log("bgMusic play err:", err));
+
+    // شغّل الصوت الخاص بهذه الصورة إذا موجود بمصفوفة sounds
+    if (i < sounds.length) {
+      currentImageAudio = new Audio(sounds[i]);
+      // خيار: ضبط مستوى صوت السرد بحيث لا يغطي الـ bgMusic
+      currentImageAudio.volume = 1.0;
+      currentImageAudio.play().catch(err => console.log("Error playing image sound:", err));
+    } else {
+      // إذا ما في صوت مطابق للصورة الحالية، للمحافظة فقط لا نفعل شيء
+      console.log("No sound defined for image index:", i);
+    }
+  }
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  layers[0].style.backgroundImage = `url('${images[0]}')`;
+  layers[0].classList.add("active");
+  prevBtn.style.display = "none";
+});
+
+startBtn.addEventListener("click", () => {
+  // إخفاء النص الافتتاحي
+  const introText = document.getElementById("introText");
+  if(introText) introText.style.display = "none";
+
+  startBtn.style.display = "none";
+  nav.classList.add("show");
+
+  // شغّل الموسيقى الخلفية من البداية
+  bgMusic.pause();
+  bgMusic.currentTime = 0;
+  bgMusic.play().catch(err => console.log("Error starting bgMusic:", err));
+
+  // عرض أول صورة وتشغيل صوتها إن وُجد
+  index = 0;
+  showImage(index);
+});
+
+
+nextBtn.addEventListener("click", () => {
+  index = Math.min(index + 1, images.length - 1);
+  showImage(index);
+});
+
+prevBtn.addEventListener("click", () => {
+  index = Math.max(index - 1, 0);
+  showImage(index);
+});
+</script>
+
+</body>
+</html>
